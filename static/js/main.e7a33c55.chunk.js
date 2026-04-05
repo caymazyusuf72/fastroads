@@ -15635,9 +15635,11 @@
             (this.onMouseMoveBound = this.onMouseMove.bind(this)),
             (this.onMouseDownBound = this.onMouseDown.bind(this)),
             (this.onMouseUpBound = this.onMouseUp.bind(this)),
+            (this.onContextMenuBound = this.onContextMenu.bind(this)),
             document.addEventListener("mousemove", this.onMouseMoveBound, !1),
             document.addEventListener("mousedown", this.onMouseDownBound, !1),
             document.addEventListener("mouseup", this.onMouseUpBound, !1),
+            document.addEventListener("contextmenu", this.onContextMenuBound, !1),
             window.localStorage.getItem(jo))
           )
             try {
@@ -15671,20 +15673,27 @@
           (this.camera.far = viewDist), this.camera.updateProjectionMatrix();
         }
         onMouseMove(e) {
-          if (this.mouseActive && input.mouse.right) {
+          if (this.mouseActive && input.click.right) {
+            console.log("Mouse move:", e.movementX, e.movementY, "Active:", this.mouseActive);
             this.mouseRotY -= e.movementX * this.mouseSense;
             this.mouseRotX += e.movementY * this.mouseSense;
             this.mouseRotX = Math.max(-Math.PI/3, Math.min(Math.PI/3, this.mouseRotX));
           }
         }
+        onContextMenu(e) {
+          e.preventDefault();
+          return false;
+        }
         onMouseDown(e) {
           if (e.button === 2) {
+            console.log("Right mouse down - activating camera control");
             this.mouseActive = true;
             e.preventDefault();
           }
         }
         onMouseUp(e) {
           if (e.button === 2) {
+            console.log("Right mouse up - deactivating camera control");
             this.mouseActive = false;
             this.mouseRotX = 0;
             this.mouseRotY = 0;
@@ -15791,6 +15800,7 @@
           document.removeEventListener("mousemove", this.onMouseMoveBound, !1);
           document.removeEventListener("mousedown", this.onMouseDownBound, !1);
           document.removeEventListener("mouseup", this.onMouseUpBound, !1);
+          document.removeEventListener("contextmenu", this.onContextMenuBound, !1);
           this.camera.clear();
         }
       };
