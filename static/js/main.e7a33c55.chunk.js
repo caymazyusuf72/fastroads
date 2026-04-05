@@ -15623,11 +15623,21 @@
             (this.uH = 0),
             (this.uCollisionCheck = 1),
             (this.randFrame = !1),
+            (this.mouseRotX = 0),
+            (this.mouseRotY = 0),
+            (this.mouseSense = 0.002),
+            (this.mouseActive = !1),
             (this.onViewChange = e),
             (this.camera = Be),
             this.camera.add(audio.listener),
             z.addListener(M, this.reset.bind(this)),
             z.addListener(N, this.initVehicleAngles.bind(this)),
+            (this.onMouseMoveBound = this.onMouseMove.bind(this)),
+            (this.onMouseDownBound = this.onMouseDown.bind(this)),
+            (this.onMouseUpBound = this.onMouseUp.bind(this)),
+            document.addEventListener("mousemove", this.onMouseMoveBound, !1),
+            document.addEventListener("mousedown", this.onMouseDownBound, !1),
+            document.addEventListener("mouseup", this.onMouseUpBound, !1),
             window.localStorage.getItem(jo))
           )
             try {
@@ -15660,6 +15670,26 @@
         updateViewDist() {
           (this.camera.far = viewDist), this.camera.updateProjectionMatrix();
         }
+        onMouseMove(e) {
+          if (this.mouseActive && input.mouse.right) {
+            this.mouseRotY -= e.movementX * this.mouseSense;
+            this.mouseRotX += e.movementY * this.mouseSense;
+            this.mouseRotX = Math.max(-Math.PI/3, Math.min(Math.PI/3, this.mouseRotX));
+          }
+        }
+        onMouseDown(e) {
+          if (e.button === 2) {
+            this.mouseActive = true;
+            e.preventDefault();
+          }
+        }
+        onMouseUp(e) {
+          if (e.button === 2) {
+            this.mouseActive = false;
+            this.mouseRotX = 0;
+            this.mouseRotY = 0;
+          }
+        }
         reset() {
           let e = 0;
           isNaN(this.orientation.y + this.targets.y) ||
@@ -15678,7 +15708,9 @@
             (this.orientation.x = this.targets.x),
             (this.orientation.y = this.targets.y - e),
             (this.orientation.z = this.targets.z),
-            (z.geo.visible = !this.mode.hideVehicle);
+            (z.geo.visible = !this.mode.hideVehicle),
+            (this.mouseRotX = 0),
+            (this.mouseRotY = 0);
         }
         setSize(e, t) {
           (this.camera.aspect = e / t),
@@ -15731,10 +15763,10 @@
             (this.targets.x *= -1),
             (this.orientation.x =
               this.targets.x * this.uSmoothC +
-              this.orientation.x * this.uSmoothD),
+              this.orientation.x * this.uSmoothD + this.mouseRotX),
             (this.orientation.y =
               this.targets.y * this.uSmoothA +
-              this.orientation.y * this.uSmoothB),
+              this.orientation.y * this.uSmoothB + this.mouseRotY),
             this.camera.setRotationFromEuler(this.orientation),
             this.camera.getWorldDirection(this.camFwd),
             Be.fwd.copy(this.camFwd).normalize().multiplyScalar(-1),
@@ -15756,6 +15788,9 @@
         }
         updateConfig() {}
         destroy() {
+          document.removeEventListener("mousemove", this.onMouseMoveBound, !1);
+          document.removeEventListener("mousedown", this.onMouseDownBound, !1);
+          document.removeEventListener("mouseup", this.onMouseUpBound, !1);
           this.camera.clear();
         }
       };
