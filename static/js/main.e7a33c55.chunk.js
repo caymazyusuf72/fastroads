@@ -15760,10 +15760,12 @@
             (this.targets.x *= -1),
             (this.orientation.x =
               this.targets.x * this.uSmoothC +
-              this.orientation.x * this.uSmoothD + this.mouseRotX),
+              this.orientation.x * this.uSmoothD),
             (this.orientation.y =
               this.targets.y * this.uSmoothA +
-              this.orientation.y * this.uSmoothB + this.mouseRotY),
+              this.orientation.y * this.uSmoothB),
+            (this.orientation.x += this.mouseRotX),
+            (this.orientation.y += this.mouseRotY),
             this.camera.setRotationFromEuler(this.orientation),
             this.camera.getWorldDirection(this.camFwd),
             Be.fwd.copy(this.camFwd).normalize().multiplyScalar(-1),
