@@ -15626,19 +15626,14 @@
             (this.mouseRotX = 0),
             (this.mouseRotY = 0),
             (this.mouseSense = 0.002),
-            (this.mouseActive = !1),
+            (this.prevMouseX = 0),
+            (this.prevMouseY = 0),
             (this.onViewChange = e),
             (this.camera = Be),
             this.camera.add(audio.listener),
             z.addListener(M, this.reset.bind(this)),
             z.addListener(N, this.initVehicleAngles.bind(this)),
-            (this.onMouseMoveBound = this.onMouseMove.bind(this)),
-            (this.onMouseDownBound = this.onMouseDown.bind(this)),
-            (this.onMouseUpBound = this.onMouseUp.bind(this)),
             (this.onContextMenuBound = this.onContextMenu.bind(this)),
-            document.addEventListener("mousemove", this.onMouseMoveBound, !1),
-            document.addEventListener("mousedown", this.onMouseDownBound, !1),
-            document.addEventListener("mouseup", this.onMouseUpBound, !1),
             document.addEventListener("contextmenu", this.onContextMenuBound, !1),
             window.localStorage.getItem(jo))
           )
@@ -15672,32 +15667,9 @@
         updateViewDist() {
           (this.camera.far = viewDist), this.camera.updateProjectionMatrix();
         }
-        onMouseMove(e) {
-          if (this.mouseActive && input.click.right) {
-            console.log("Mouse move:", e.movementX, e.movementY, "Active:", this.mouseActive);
-            this.mouseRotY -= e.movementX * this.mouseSense;
-            this.mouseRotX += e.movementY * this.mouseSense;
-            this.mouseRotX = Math.max(-Math.PI/3, Math.min(Math.PI/3, this.mouseRotX));
-          }
-        }
         onContextMenu(e) {
           e.preventDefault();
           return false;
-        }
-        onMouseDown(e) {
-          if (e.button === 2) {
-            console.log("Right mouse down - activating camera control");
-            this.mouseActive = true;
-            e.preventDefault();
-          }
-        }
-        onMouseUp(e) {
-          if (e.button === 2) {
-            console.log("Right mouse up - deactivating camera control");
-            this.mouseActive = false;
-            this.mouseRotX = 0;
-            this.mouseRotY = 0;
-          }
         }
         reset() {
           let e = 0;
@@ -15727,6 +15699,20 @@
             this.onViewChange();
         }
         update(e) {
+          if (input.click.right) {
+            let deltaX = input.mouse.x - this.prevMouseX;
+            let deltaY = input.mouse.y - this.prevMouseY;
+            console.log("Right click active - delta:", deltaX, deltaY);
+            this.mouseRotY -= deltaX * this.mouseSense;
+            this.mouseRotX += deltaY * this.mouseSense;
+            this.mouseRotX = Math.max(-Math.PI/3, Math.min(Math.PI/3, this.mouseRotX));
+          } else {
+            this.mouseRotX = 0;
+            this.mouseRotY = 0;
+          }
+          this.prevMouseX = input.mouse.x;
+          this.prevMouseY = input.mouse.y;
+          
           input.key[keyMap.Camera] &&
             ((this.modeIndex = (this.modeIndex + 1) % No.length),
             (this.mode = Mo[No[this.modeIndex]]),
@@ -15797,9 +15783,6 @@
         }
         updateConfig() {}
         destroy() {
-          document.removeEventListener("mousemove", this.onMouseMoveBound, !1);
-          document.removeEventListener("mousedown", this.onMouseDownBound, !1);
-          document.removeEventListener("mouseup", this.onMouseUpBound, !1);
           document.removeEventListener("contextmenu", this.onContextMenuBound, !1);
           this.camera.clear();
         }
