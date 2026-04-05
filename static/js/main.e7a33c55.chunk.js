@@ -15603,6 +15603,7 @@
           );
         }
         constructor(e) {
+          console.log("=== CHASE CAMERA CONSTRUCTOR CALLED WITH MOUSE CONTROL ===");
           if (
             ((this.onViewChange = () => {}),
             (this.mode = Mo[No[S]]),
@@ -15699,10 +15700,11 @@
             this.onViewChange();
         }
         update(e) {
+          console.log("Update - input.click.right:", input.click.right, "mouseEnabled:", input.mouseEnabled, "mouse:", input.mouse.x, input.mouse.y);
           if (input.click.right) {
             let deltaX = input.mouse.x - this.prevMouseX;
             let deltaY = input.mouse.y - this.prevMouseY;
-            console.log("Right click active - delta:", deltaX, deltaY);
+            console.log("Right click ACTIVE - delta:", deltaX, deltaY, "mouseRot:", this.mouseRotX, this.mouseRotY);
             this.mouseRotY -= deltaX * this.mouseSense;
             this.mouseRotX += deltaY * this.mouseSense;
             this.mouseRotX = Math.max(-Math.PI/3, Math.min(Math.PI/3, this.mouseRotX));
